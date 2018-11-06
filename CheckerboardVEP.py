@@ -65,14 +65,18 @@ class CheckerboardVEP:
 
 if __name__=='__main__':
 
-    win = visual.Window([1920,1080],monitor="testMonitor", units="norm", checkTiming=True)
+    win = visual.Window([1600,800],monitor="ASUSLaptopMonitor", units="norm", checkTiming=True)
     print("Estimated Frame Duration: {0}".format(win.monitorFramePeriod))
     cur_ms_per_frame = win.getMsPerFrame(nFrames=300, msg='Assessing Frame Rate...')
     print("Estimated ms per Frame: Avg: {0} Standard Dev: {1}, Median: {2}".format(cur_ms_per_frame[0], cur_ms_per_frame[1], cur_ms_per_frame[2]))                      
 
-    reversal_freq = 5
+    reversal_freq = 4
 
-    trial_duration = 30 #seconds
+    trial_duration = 40 #seconds
     
     check = CheckerboardVEP(win, cur_ms_per_frame[2], reversal_freq, trial_duration)
+
+    while len(event.getKeys()) < 1:
+        core.wait(1.0)
+
     check.stimulate()

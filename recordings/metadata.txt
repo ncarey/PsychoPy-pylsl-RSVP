@@ -1,0 +1,79 @@
+D:\Workspace\PULSD\PsychoPy-pylsl-RSVP>python CheckerboardVEP.py
+Estimated Frame Duration: 0.016930401703257304
+Estimated ms per Frame: Avg: 16.86640822232452 Standard Dev: 0.6605572528847398,
+ Median: 16.824364398795904
+Desired reversal frequency: 5 Hz
+Desired ms duration per reversal: 200.0 ms
+Actual frames per reversal: 11 frames
+Actual ms duration per reversal: 185.06800838675494 ms
+Actual reversal frequency: 5.40341903885517 Hz
+
+D:\Workspace\PULSD\PsychoPy-pylsl-RSVP>python CheckerboardVEP.py
+Estimated Frame Duration: 0.016928348971032393
+Estimated ms per Frame: Avg: 20.3421054146987 Standard Dev: 60.61699827458754, M
+edian: 16.735275820186263
+Desired reversal frequency: 4 Hz
+Desired ms duration per reversal: 250.0 ms
+Actual frames per reversal: 14 frames
+Actual ms duration per reversal: 234.2938614826077 ms
+Actual reversal frequency: 4.268144259828305 Hz
+
+D:\Workspace\PULSD\PsychoPy-pylsl-RSVP>python CheckerboardVEP.py
+Estimated Frame Duration: 0.016773778234255587
+Estimated ms per Frame: Avg: 20.618031071915592 Standard Dev: 64.51511726375435,
+ Median: 16.8689086882902
+Desired reversal frequency: 3 Hz
+Desired ms duration per reversal: 333.3333333333333 ms
+Actual frames per reversal: 19 frames
+Actual ms duration per reversal: 320.5092650775138 ms
+Actual reversal frequency: 3.120034610413381 Hz
+
+D:\Workspace\PULSD\PsychoPy-pylsl-RSVP>python CheckerboardVEP.py
+Estimated Frame Duration: 0.016742617759155108
+Estimated ms per Frame: Avg: 23.62528378542442 Standard Dev: 116.42493916892955,
+ Median: 16.87010611529634
+Desired reversal frequency: 2 Hz
+Desired ms duration per reversal: 500.0 ms
+Actual frames per reversal: 29 frames
+Actual ms duration per reversal: 489.2330773435939 ms
+Actual reversal frequency: 2.044015513893164 Hz
+
+D:\Workspace\PULSD\PsychoPy-pylsl-RSVP>python CheckerboardVEP.py
+Estimated Frame Duration: 0.016747010606013645
+Estimated ms per Frame: Avg: 21.803388505366968 Standard Dev: 84.66513766902314,
+ Median: 16.921287572131405
+Desired reversal frequency: 6 Hz
+Desired ms duration per reversal: 166.66666666666666 ms
+Actual frames per reversal: 9 frames
+Actual ms duration per reversal: 152.29158814918264 ms
+Actual reversal frequency: 6.566350854653997 Hz
+
+D:\Workspace\PULSD\PsychoPy-pylsl-RSVP>python CheckerboardVEP.py
+Estimated Frame Duration: 0.016913405080413214
+Estimated ms per Frame: Avg: 20.012880118947788 Standard Dev: 53.87536467899424,
+ Median: 16.934938241395987
+Desired reversal frequency: 6 Hz
+Desired ms duration per reversal: 166.66666666666666 ms
+Actual frames per reversal: 9 frames
+Actual ms duration per reversal: 152.4144441725639 ms
+Actual reversal frequency: 6.561057945845332 Hz
+
+D:\Workspace\PULSD\PsychoPy-pylsl-RSVP>python CheckerboardVEP.py
+Estimated Frame Duration: 0.016844310113629034
+Estimated ms per Frame: Avg: 23.13078677057655 Standard Dev: 107.81440957936533,
+ Median: 16.844994357597898
+Desired reversal frequency: 5 Hz
+Desired ms duration per reversal: 200.0 ms
+Actual frames per reversal: 11 frames
+Actual ms duration per reversal: 185.29493793357688 ms
+Actual reversal frequency: 5.396801505492138 Hz
+
+D:\Workspace\PULSD\PsychoPy-pylsl-RSVP>python CheckerboardVEP.py
+Estimated Frame Duration: 0.016874936878411972
+Estimated ms per Frame: Avg: 16.899460643853853 Standard Dev: 0.6311360012532627
+, Median: 16.9577919934909
+Desired reversal frequency: 4 Hz
+Desired ms duration per reversal: 250.0 ms
+Actual frames per reversal: 14 frames
+Actual ms duration per reversal: 237.4090879088726 ms
+Actual reversal frequency: 4.212138670882899 Hz
