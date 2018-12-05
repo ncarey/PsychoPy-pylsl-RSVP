@@ -1,13 +1,16 @@
 from psychopy import visual, core, event
 from pylsl import StreamInfo, StreamOutlet
 import os
+import numpy as np
+
 
 class RSVPTrainingDataCollection:
 
-    #TODO - should be sending a string of the imageStim image filename...
-    def sendStimMarker(self, cur_frame=1):
-        self.stim_stream_outlet.push_sample(x=[cur_frame])
+    #sending a string of the imageStim image filename
+    def sendStimMarker(self, cur_file):
+        self.stim_stream_outlet.push_sample(x=[cur_file])
 
+    #Just sending a marker to indicate this is a target
     def sendTargetMarker(self, cur_frame=1):
         self.target_stream_outlet.push_sample(x=[cur_frame])
 
@@ -18,18 +21,51 @@ class RSVPTrainingDataCollection:
             self.RSVP_trial()
 
 
-    #TODO Do a round of RSVP
+    #Do a round of RSVP
     def RSVP_trial(self):
 
+        recent_target = True
+        stims_since_target = 4
+
         for image_index in range(self.n_images_per_trial):
-            #select image to flip
-    
-           
-            #prepare the CallOnFlip method for first frame of Stim
+            #select image to flip # TODO TBH we should do this before a trial, not during...
+            
+            if recent_target is False:
+                #perhaps we show a target? TODO for now we hardcode 30% chance
+                is_target = np.random.randint(low=0, high=10)
+                if is_target < 3:
+                    #select a target
+                    #prepare the CallOnFlip method for first frame of Stim
+                    target_index = np.random.randint(low=0, high=len(self.target_images))
+                    self.to_present = self.target_images[target_index]
+                    self.window.callOnFlip(self.sendTargetMarker, cur_frame=image_index)
+                    self.window.callOnFlip(self.sendStimMarker, cur_file=self.to_present.image)
+                    recent_target = True
+                    stims_since_target = 0
+                else:
+                    #select a distractor
+                    #prepare the CallOnFlip method for first frame of Stim
+                    dist_index = np.random.randint(low=0, high=len(self.distract_images))
+                    self.to_present = self.distract_images[dist_index]
+                    self.window.callOnFlip(self.sendStimMarker, cur_file=self.to_present.image)
+
+            else:
+                #select a distractor
+                #prepare the CallOnFlip method for first frame of Stim
+                dist_index = np.random.randint(low=0, high=len(self.distract_images))
+                self.to_present = self.distract_images[dist_index]
+                self.window.callOnFlip(self.sendStimMarker, cur_file=self.to_present.image)
+                stims_since_target = stims_since_target + 1
+                if stims_since_target > 8: #TODO remove magic number hardcode
+                    stims_since_target = 0
+                    recent_target = False
+
+                
 
             #flip an image
             for frame in range(self.stim_duration_frames):
-
+                self.to_present.draw()
+                self.window.flip()
             #flip a blank
             for frame in range(self.blank_duration_frames):
                 self.blank_image.draw()
@@ -37,17 +73,27 @@ class RSVPTrainingDataCollection:
                            
 
 
-    #TODO populate distractor array with references to imageStim objects each contianing an image in provided target_image_folder
-    def load_distractor_images(self):
+    #populate distractor array with references to imageStim objects each contianing an image in provided target_image_folder
+    def load_distract_images(self):
+        self.distract_images = []
+        for file in os.listdir(self.distract_image_folder):
+            f_name = os.fsdecode(file)
+            f_path = os.path.join(self.distract_image_folder, f_name)
+            cur_image = visual.ImageStim(win=self.window, image=f_path, name=f_name)
+            self.distract_images.append(cur_image)
 
 
 
-    #TODO populate targets array with references to ImageStim objects each containing an image in provided target_image_folder
+    #populate targets array with references to ImageStim objects each containing an image in provided target_image_folder
     def load_target_images(self):
+        self.target_images = []
+        for file in os.listdir(self.target_image_folder):
+            f_name = os.fsdecode(file)
+            f_path = os.path.join(self.target_image_folder, f_name)
+            cur_image = visual.ImageStim(win=self.window, image=f_path, name=f_name)
+            self.target_images.append(cur_image)
 
-        
-
-    def update_frame_rate(self, nFramesToTest=250):
+    def update_frame_rate(self, nFramesToTest=150):
         
         print("Estimated Frame Duration: {0}".format(self.window.monitorFramePeriod))
         cur_ms_per_frame_arr = self.window.getMsPerFrame(nFrames=nFramesToTest, msg='Assessing Frame Rate...')
@@ -68,11 +114,13 @@ class RSVPTrainingDataCollection:
         print("Actual Blank Flash Duration: {0} ms".format(self.actual_blank_ms))
         print("Actual Image Presentation Frequency: {0} Hz".format(self.actual_stim_freq))
 
-    def __init__(self, window, target_image_folder, distract_image_folder,
+    def __init__(self, window,
+                 target_image_folder=os.path.join('D:\Workspace','PULSD','PsychoPy-pylsl-RSVP','images','target'),
+                 distract_image_folder=os.path.join('D:\Workspace','PULSD','PsychoPy-pylsl-RSVP','images','distract'),
                  blank_image_path=os.path.join('D:\Workspace','PULSD','PsychoPy-pylsl-RSVP','images','blank','black.png'),
-                 trials=4,
+                 trials=16,
                  inter_trial_rest=4,
-                 n_images_per_trial=20,
+                 n_images_per_trial=25,
                  rest_after_target_length=8,
                  ms_per_frame=20,
                  ms_stim_flash_dur=250,
@@ -84,9 +132,12 @@ class RSVPTrainingDataCollection:
         self.distract_image_folder = distract_image_folder
         self.blank_image_path = blank_image_path
         self.blank_image = visual.ImageStim(win=self.window, image=self.blank_image_path, name='blank')
+        self.to_present = self.blank_image
+        self.target_images = []
+        self.distract_images = []
         
         #PyLSL streams
-        self.stim_stream_info = StreamInfo(name='stim_stream', type='Markers', channel_count=1, channel_format='int32', source_id='psychopyStimuli')
+        self.stim_stream_info = StreamInfo(name='stim_stream', type='Markers', channel_count=1, channel_format='string', source_id='psychopyStimuli')
         self.stim_stream_outlet = StreamOutlet(self.stim_stream_info)
         
         self.target_stream_info = StreamInfo(name='target_stream', type='Markers', channel_count=1, channel_format='int32', source_id='psychopyTargets')
@@ -111,7 +162,17 @@ class RSVPTrainingDataCollection:
         self.actual_stim_freq = 0.0
 
         self.update_frame_rate()
-
+        self.load_target_images()
+        self.load_distract_images()
         
-
         
+if __name__=='__main__':
+
+    win = visual.Window([1600,800],monitor="ASUSLaptopMonitor", units="norm", checkTiming=True)
+
+    RSVPTrain = RSVPTrainingDataCollection(win)
+
+    while len(event.getKeys()) < 1:
+        core.wait(1.0)
+
+    RSVPTrain.execute_trials()
