@@ -1,0 +1,6 @@
+[submodule "xdf"]
+	path = xdf
+	url = https://github.com/sccn/xdf.git
+[submodule "SciScript-Python"]
+	path = SciScript-Python
+	url = https://github.com/sciserver/SciScript-Python.git
