@@ -39,7 +39,7 @@ git clone --recurse-submodules https://github.com/ncarey/PsychoPy-pylsl-RSVP.git
 
 Method B: init submodules after clone:
 
-(in submodule repository directory):
+(in project root repository directory, i think):
 
 git submodule init
 

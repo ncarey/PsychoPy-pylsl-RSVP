@@ -14,7 +14,7 @@ from datetime import datetime, timedelta     # date and timestamp tools
 from pprint import pprint
 import sys
 import os.path
-
+import datetime
 #BELOW is not necessary since we are currently running from project directory
 #since we need to import libs from parent dir, need to add parent dir to path
 #project_path = '/home/idies/workspace/Storage/ncarey/persistent/PULSD/PsychoPy-pylsl-RSVP/'
@@ -25,11 +25,15 @@ from xdf.Python.xdf import load_xdf
 
 user = input("SciServer Username:")
 passw = input("SciServer Password:")
-token = Authentication.login(user=user, password=passw)
+token = Authentication.login(UserName=user, Password=passw)
 
 
 session_name = 'RSVPTraining.xdf'
-dest_path = os.path.join('/Storage/ncarey/persistent/PULSD/data_backup', session_name)
+session_desc = 'Name: RSVPTraining.xdf, Subject: Nick Carey, Dataset: HiddenCube'
+session_stim_length_ms = 233.3
+
+#dest_path = os.path.join('/Storage/ncarey/persistent/PULSD/data_backup', session_name)
+dest_path = '/Storage/ncarey/persistent/PULSD/data_backup/' + session_name 
 local_xdf_path = os.path.join('D:\Workspace\PULSD\PsychoPy-pylsl-RSVP','recordings', session_name)
 
 
@@ -44,15 +48,54 @@ else:
     session_ID = int(df['Column1'][0]) + 1
 
 
-session_datetime = '' #???? need to test inserting datetime
-
-
-
-
-
+session_datetime = datetime.datetime.now() #???? need to test inserting datetime
 
 fileServices = Files.getFileServices()
-Files.upload(fileServices[0], dest_path, local_xdf_path)
+Files.upload(fileServices[0], path=dest_path, localFilePath=local_xdf_path)
+
+insert_query ='''INSERT INTO sessions
+(session_ID, session_datetime, session_filepath, session_desc, session_stim_length_ms)
+VALUES
+({0}, '{1}', '{2}', '{3}', {4})'''.format(session_ID, session_datetime, dest_path, session_desc, session_stim_length_ms)
+
+print(insert_query)
+response = CasJobs.executeQuery(sql=insert_query, context=context)
+
+#insert data time
+xdf = load_xdf(local_xdf_path, verbose=False)
+
+#print(xdf[0][0].keys())
+
+#you will need to dbl check this. your xdf may not be indexed the same way
+#I think time series is the frame count(or data), time stamps is the actual clock
+target_time_series = xdf[0][0]['time_series']
+target_time_stamps = xdf[0][0]['time_stamps']
+
+eeg_time_series = xdf[0][1]['time_series']
+eeg_time_stamps = xdf[0][1]['time_stamps']
+
+stim_time_series = xdf[0][2]['time_series']
+stim_time_stamps = xdf[0][2]['time_stamps']
+
+
+insert_query_template = '''INSERT INTO session_eeg
+(session_ID, timestamp, F3, Fz, F4, T7, C3, Cz, C4, T8, Cp3, Cp4, P3, Pz, P4, PO7, PO8, Oz)
+VALUES
+({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}, {13}, {14}, {15}, {16}, {17})'''
+
+#Below is way too slow. talking 2 inserts per second for 100,000 inserts..
+# maybe try this? SciServer.CasJobs.uploadPandasDataFrameToTable(dataFrame, tableName, context='MyDB')
+for index in range(len(eeg_time_series)):
+    cur_time_stamp = eeg_time_stamps[index]
+    cur_eeg_reading = eeg_time_series[index]
+    insert_query = insert_query_template.format(session_ID, cur_time_stamp, cur_eeg_reading[0],
+                                                cur_eeg_reading[1], cur_eeg_reading[2], cur_eeg_reading[3],
+                                                cur_eeg_reading[4], cur_eeg_reading[5], cur_eeg_reading[6],
+                                                cur_eeg_reading[7], cur_eeg_reading[8], cur_eeg_reading[9],
+                                                cur_eeg_reading[10], cur_eeg_reading[11], cur_eeg_reading[12],
+                                                cur_eeg_reading[13], cur_eeg_reading[14], cur_eeg_reading[15])
+    print(insert_query)
+    response = CasJobs.executeQuery(sql=insert_query, context=context)
 
 doc = '''
 SciServer.Files.upload(fileService, path, data='', localFilePath=None, quiet=True)
