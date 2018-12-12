@@ -28,14 +28,17 @@ passw = input("SciServer Password:")
 token = Authentication.login(UserName=user, Password=passw)
 
 
-session_name = 'RSVPTraining.xdf'
-session_desc = 'Name: RSVPTraining.xdf, Subject: Nick Carey, Dataset: HiddenCube'
+session_name = 'RSVPTraining5.xdf'
+session_desc = 'Name: RSVPTraining5.xdf, Dataset: HiddenCube'
+subject_name = 'Nick Carey'
+dataset_name = 'HiddenCube'
+
 session_stim_length_ms = 233.3
 
 #dest_path = os.path.join('/Storage/ncarey/persistent/PULSD/data_backup', session_name)
 dest_path = '/Storage/ncarey/persistent/PULSD/data_backup/' + session_name 
 local_xdf_path = os.path.join('D:\Workspace\PULSD\PsychoPy-pylsl-RSVP','recordings', session_name)
-
+print(local_xdf_path)
 
 context = "MyDB"
 query_id = 'SELECT MAX(session_ID) from sessions'
@@ -48,18 +51,19 @@ else:
     session_ID = int(df['Column1'][0]) + 1
 
 
-session_datetime = datetime.datetime.now() #???? need to test inserting datetime
-
-fileServices = Files.getFileServices()
-Files.upload(fileServices[0], path=dest_path, localFilePath=local_xdf_path)
+session_datetime = datetime.datetime.now()
+#UNCOMMENT
+#fileServices = Files.getFileServices()
+#Files.upload(fileServices[0], path=dest_path, localFilePath=local_xdf_path)
 
 insert_query ='''INSERT INTO sessions
-(session_ID, session_datetime, session_filepath, session_desc, session_stim_length_ms)
+(session_ID, session_datetime, session_filepath, session_desc, session_stim_length_ms, subject_name, dataset_name)
 VALUES
-({0}, '{1}', '{2}', '{3}', {4})'''.format(session_ID, session_datetime, dest_path, session_desc, session_stim_length_ms)
+({0}, '{1}', '{2}', '{3}', {4}, {5}, {6})'''.format(session_ID, session_datetime, dest_path, session_desc, session_stim_length_ms, subject_name, dataset_name)
 
-print(insert_query)
-response = CasJobs.executeQuery(sql=insert_query, context=context)
+#UNCOMMENT THIS
+#print(insert_query)
+#response = CasJobs.executeQuery(sql=insert_query, context=context)
 
 #insert data time
 xdf = load_xdf(local_xdf_path, verbose=False)
@@ -77,6 +81,22 @@ eeg_time_stamps = xdf[0][1]['time_stamps']
 stim_time_series = xdf[0][2]['time_series']
 stim_time_stamps = xdf[0][2]['time_stamps']
 
+dtype = [('session_ID','int32'),('timestamp','int32'), ('F3','float32'), ('Fz','float32'), ('F4','float32'), ('T7','float32'), ('C3','float32'),
+         ('Cz','float32'), ('C4','float32'), ('T8','float32'), ('Cp3','float32'), ('Cp4','float32'), ('P3','float32'), ('Pz','float32'), ('P4','float32'),
+         ('PO7','float32'), ('PO8','float32'), ('Oz','float32')]
+values = []
+for index in range(len(eeg_time_stamps)):
+    cur_row = []
+    cur_row.append(session_ID)
+    cur_row.append(eeg_time_stamps[index])
+    for eeg_index in range(len(eeg_time_series[index])):
+        cur_row.append(eeg_time_series[index][eeg_index])
+    values.append(cur_row)
+
+index = range(len(eeg_time_stamps))
+
+df_to_insert = pandas.DataFrame(data=values, index=index, columns=dtype)
+
 
 insert_query_template = '''INSERT INTO session_eeg
 (session_ID, timestamp, F3, Fz, F4, T7, C3, Cz, C4, T8, Cp3, Cp4, P3, Pz, P4, PO7, PO8, Oz)
@@ -85,17 +105,17 @@ VALUES
 
 #Below is way too slow. talking 2 inserts per second for 100,000 inserts..
 # maybe try this? SciServer.CasJobs.uploadPandasDataFrameToTable(dataFrame, tableName, context='MyDB')
-for index in range(len(eeg_time_series)):
-    cur_time_stamp = eeg_time_stamps[index]
-    cur_eeg_reading = eeg_time_series[index]
-    insert_query = insert_query_template.format(session_ID, cur_time_stamp, cur_eeg_reading[0],
-                                                cur_eeg_reading[1], cur_eeg_reading[2], cur_eeg_reading[3],
-                                                cur_eeg_reading[4], cur_eeg_reading[5], cur_eeg_reading[6],
-                                                cur_eeg_reading[7], cur_eeg_reading[8], cur_eeg_reading[9],
-                                                cur_eeg_reading[10], cur_eeg_reading[11], cur_eeg_reading[12],
-                                                cur_eeg_reading[13], cur_eeg_reading[14], cur_eeg_reading[15])
-    print(insert_query)
-    response = CasJobs.executeQuery(sql=insert_query, context=context)
+#for index in range(len(eeg_time_series)):
+#    cur_time_stamp = eeg_time_stamps[index]
+#    cur_eeg_reading = eeg_time_series[index]
+#    insert_query = insert_query_template.format(session_ID, cur_time_stamp, cur_eeg_reading[0],
+#                                                cur_eeg_reading[1], cur_eeg_reading[2], cur_eeg_reading[3],
+#                                                cur_eeg_reading[4], cur_eeg_reading[5], cur_eeg_reading[6],
+#                                                cur_eeg_reading[7], cur_eeg_reading[8], cur_eeg_reading[9],
+#                                                cur_eeg_reading[10], cur_eeg_reading[11], cur_eeg_reading[12],
+#                                                cur_eeg_reading[13], cur_eeg_reading[14], cur_eeg_reading[15])
+#    print(insert_query)
+#    response = CasJobs.executeQuery(sql=insert_query, context=context)
 
 doc = '''
 SciServer.Files.upload(fileService, path, data='', localFilePath=None, quiet=True)
