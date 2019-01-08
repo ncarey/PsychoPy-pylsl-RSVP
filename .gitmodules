@@ -4,3 +4,9 @@
 [submodule "SciScript-Python"]
 	path = SciScript-Python
 	url = https://github.com/sciserver/SciScript-Python.git
+[submodule "mne-python"]
+	path = mne-python
+	url = git://github.com/mne-tools/mne-python.git
+[submodule "arl-eegmodels"]
+	path = arl-eegmodels
+	url = https://github.com/vlawhern/arl-eegmodels.git

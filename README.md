@@ -11,7 +11,27 @@ PsychoPy is a bit more tricky. Try:
 Review http://psychopy.org/installation.html for issues with PsychoPy installation
 
 
-This git project has two submodules:
+This git project has four submodules:
+
+EEGNet (ARL) a compact convolutional nerual net for EEG epoch classification 
+
+Github: https://github.com/vlawhern/arl-eegmodels
+    
+git submodule add https://github.com/vlawhern/arl-eegmodels.git
+
+(in ~/.keras/keras.json) change channels_last to channels_first
+
+Requirements for EEGNet are listed in the readme above (Tensorflow, Keras, etc)
+
+--------------------
+
+MNE, for EEG data processing
+
+Install guide:  https://mne-tools.github.io/stable/advanced_setup.html#advanced-setup
+
+git submodule add git://github.com/mne-tools/mne-python.git
+cd mne-python
+python setup.py develop
 
 SciScript-Python, for interaction with SciServer
 
