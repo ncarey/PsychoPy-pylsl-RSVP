@@ -29,9 +29,14 @@ MNE, for EEG data processing
 
 Install guide:  https://mne-tools.github.io/stable/advanced_setup.html#advanced-setup
 
+One time MNE install for current user: 
+pip install --user --upgrade --no-deps git+https://github.com/mne-tools/mne-python.git
+
+Latest MNE build:
 git submodule add git://github.com/mne-tools/mne-python.git
 cd mne-python
 python setup.py develop
+
 
 SciScript-Python, for interaction with SciServer
 
